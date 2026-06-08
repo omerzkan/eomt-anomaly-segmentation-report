@@ -42,3 +42,5 @@ __pycache__/
 # OS
 .env
 .env.local
+
+!main.pdf
