@@ -89,18 +89,18 @@ COCO's DINOv2-backed visual priors working well, the only problem was the classi
 In the Table~\ref{tab:anomaly_results}, we see these results from the comparison of ERFNet and EoMT:
 \begin{itemize}
     \item On RoadAnomaly-21 dataset, ERFNet's MaxLogit is 38.31, and EoMT-Cityscapes' MaxEntropy is 77.88. There are ~40\% difference
-    \item On RoadObsticle-21 dataset, ERFNet's MaxLogit is 4.63 and EoMT-Cityscapes' MSP is 90.11. There are ~85\% difference
+    \item On RoadObstacle-21 dataset, ERFNet's MaxLogit is 4.63 and EoMT-Cityscapes' MSP is 90.11. There are ~85\% difference
     \item On RoadAnomaly dataset, ERFNet's MaxLogit 15.58 and EoMT-Cityscapes' MaxEntropy 78.14. There are ~63\% difference
 \end{itemize}
 With these results, we achieved that on most benchmarks, the EoMT's models substantially outperform the ERFNet. Because mask-based classification 
-creates smooth shapes because it looks at the whole object at once. However, pixel-softmax looks at each pixel one by one, that's why it is valnureable to noise.
+creates smooth shapes because it looks at the whole object at once. However, pixel-softmax looks at each pixel one by one, that's why it is vulnerable to noise.
 
 \paragraph{Effect of fine-tuning.}
 
 To see the effect of the fine-tuning, we compare the EoMT-Cityscapes with EoMT-Fine-tuned on AuPRC on the Table~\ref{tab:anomaly_results}.
 \begin{itemize}
     \item On RoadAnomaly-21 dataset: MSP score drops from 74.36\% to 57.15\% (~17\% change)
-    \item On RoadObsticle-21 dataset: MSP score drops from 90.11\% to 73.61\% (~16\% change)
+    \item On RoadObstacle-21 dataset: MSP score drops from 90.11\% to 73.61\% (~16\% change)
     \item On RoadAnomaly dataset: MSP score drops from 75.69\% to 54.99\% (~21\% change)
     \item On FS L\&F dataset: MSP score increases from 25.42\% to 27.11\% (~2\% change)
 \end{itemize}
