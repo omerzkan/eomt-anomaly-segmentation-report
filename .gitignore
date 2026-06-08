@@ -1,0 +1,44 @@
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.brf
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.idx
+*.ilg
+*.ind
+*.gl*
+*.glo
+*.ist
+
+# PDF files (generated)
+*.pdf
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.env
+.env.local

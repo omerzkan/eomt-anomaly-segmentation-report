@@ -1,0 +1,156 @@
+\section{Results}
+
+We evaluated closed-set semantic segmentation on Cityscapes validation datasets, and anomaly segmentation on 5 benchmarks.
+Our findings include that mask-based EoMT model outperforms the pixel-based ERFNet on both tasks.
+Another interesting point that fine-tuning on COCO-EoMT improves mIoU result but degrades anomaly performance.
+As last, temperature scaling has limited effect on the anomaly metrics for this task.
+
+\subsection{Semantic Segmentation}
+
+\begin{table}[!htbp]
+\centering
+\caption{Closed-set semantic segmentation results on \texttt{Cityscapes validation dataset} (mIoU \%). 
+EoMT-COCO is evaluated zero-shot with a class-mapping from COCO to Cityscapes. 
+EoMT-Fine-tuned originally come from EoMT-COCO and fine-tuned on Cityscapes.}
+\label{tab:semseg}
+\begin{tabular}{lc}
+\toprule
+Model & mIoU \\
+\midrule
+ERFNet & 72.50 \\
+EoMT-COCO (zero-shot) & 55.17 \\
+EoMT-Cityscapes & \textbf{81.68} \\
+EoMT-Fine-tuned & 78.85 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+As mentioned in the Table~\ref{tab:semseg}, 
+EoMT-Cityscapes is the strongest model with a score 81.68\% between the 
+compared model, and Fine-tuning substantially boost the mIoU.
+Beside them ERFNet's 72.50 score is competitive for a pixel-based model.
+Qualitative predictions for these models are shown in Figure~\ref{fig:step4}.
+
+\begin{figure*}[!htbp]
+\centering
+\includegraphics[width=\linewidth]{results/figures/step4/step4_comparison.png}
+\caption{Semantic segmentation results for EoMT-COCO and EoMT-Cityscapes. Left to right: original driving scenes, the ideal color-coded
+target maps, and the actual pixel-level predictions made by the models.}
+\label{fig:step4}
+\end{figure*}
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Per-class IoU (\%) on \texttt{Cityscapes validation dataset}: EoMT-COCO (zero-shot with class mapping) 
+versus EoMT-Cityscapes. EoMT-COCO scores 0\% on classes with no COCO equivalent.}
+\label{tab:perclass}
+\begin{tabular}{lcc}
+\toprule
+Class & EoMT-COCO & EoMT-Cityscapes \\
+\midrule
+road          & 94.13 & 98.40 \\
+sidewalk      & 64.81 & 87.36 \\
+building      & 86.77 & 94.15 \\
+wall          & 46.20 & 66.07 \\
+fence         & 50.01 & 65.49 \\
+pole          & \textbf{0.00}  & 71.04 \\
+traffic light & 60.79 & 75.00 \\
+traffic sign  & \textbf{4.74}  & 82.13 \\
+vegetation    & 88.15 & 93.02 \\
+terrain       & 56.84 & 66.60 \\
+sky           & 89.73 & 95.54 \\
+person        & 70.51 & 85.38 \\
+rider         & \textbf{0.00}  & 71.11 \\
+car           & 84.33 & 95.54 \\
+truck         & 29.37 & 81.78 \\
+bus           & 71.17 & 90.32 \\
+train         & 13.63 & 77.36 \\
+motorcycle    & 63.78 & 74.35 \\
+bicycle       & 73.34 & 81.27 \\
+\midrule
+\textbf{Mean} & \textbf{55.17} & \textbf{81.68} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+As referenced in the Table~\ref{tab:perclass}, some classes have near or 0\% IoU score. 
+This happens because there is no equivalent class labels in COCO dataset, and COCO-EoMT can't classify them for this reason.
+It is not the problem of the model but a label space mismatch. This problem was the motivation for fine-tuning the COCO-EoMT on Cityscapes.
+Fine-tuning lifts mIoU from 55.17 to 78.85, which recovers the most of the gap which is only ~3\%. This result shows that
+COCO's DINOv2-backed visual priors working well, the only problem was the classification head, not the features.
+
+\subsection{Anomaly Segmentation}
+
+\input{results/tables/latex_tables/result_table.tex}
+
+\paragraph{Pixel-based vs mask-based.}
+
+In the Table~\ref{tab:anomaly_results}, we see these results from the comparison of ERFNet and EoMT:
+\begin{itemize}
+    \item On RoadAnomaly-21 dataset, ERFNet's MaxLogit is 38.31, and EoMT-Cityscapes' MaxEntropy is 77.88. There are ~40\% difference
+    \item On RoadObsticle-21 dataset, ERFNet's MaxLogit is 4.63 and EoMT-Cityscapes' MSP is 90.11. There are ~85\% difference
+    \item On RoadAnomaly dataset, ERFNet's MaxLogit 15.58 and EoMT-Cityscapes' MaxEntropy 78.14. There are ~63\% difference
+\end{itemize}
+With these results, we achieved that on most benchmarks, the EoMT's models substantially outperform the ERFNet. Because mask-based classification 
+creates smooth shapes because it looks at the whole object at once. However, pixel-softmax looks at each pixel one by one, that's why it is valnureable to noise.
+
+\paragraph{Effect of fine-tuning.}
+
+To see the effect of the fine-tuning, we compare the EoMT-Cityscapes with EoMT-Fine-tuned on AuPRC on the Table~\ref{tab:anomaly_results}.
+\begin{itemize}
+    \item On RoadAnomaly-21 dataset: MSP score drops from 74.36\% to 57.15\% (~17\% change)
+    \item On RoadObsticle-21 dataset: MSP score drops from 90.11\% to 73.61\% (~16\% change)
+    \item On RoadAnomaly dataset: MSP score drops from 75.69\% to 54.99\% (~21\% change)
+    \item On FS L\&F dataset: MSP score increases from 25.42\% to 27.11\% (~2\% change)
+\end{itemize}
+
+According to these results, EoMT-COCO recovers closed set mIoU (Table~\ref{tab:semseg}) but decrease the anomaly scores compared to training from scratch on Cityscapes.
+This happens because training the model for a short time makes it hyper-focused on normal objects, and this ruins its ability to spot unusual things. 
+
+\paragraph{Comparison of scoring functions.}
+Interesting finding here is that MaxLogit beats MSP and MaxEntropy on ERFNet (38.31 vs 29.09 vs 30.96 on RA-21), but on EoMT they are almost same.
+This result shows that scoring-method choice depends on the architecture.
+RbA has a different pattern in here. It achieves highest AuPRC on FS L\&F (30.61) and FS Static (56.29) for EoMT-Fine-tuned. 
+However, it also produces high score for FPR95, so it separates the outlier but it is too sensitive so it makes a lot of false alarms.  
+
+\paragraph{Qualitative results.}
+Figure~\ref{fig:step8} shows anomaly score maps for the four scoring methods on representative RoadAnomaly21 images.
+
+\begin{figure*}[!htbp]
+\centering
+\includegraphics[width=\linewidth]{results/figures/step8/step8_anomaly_maps.png}
+\caption{Qualitative comparison of anomaly score maps on RoadAnomaly21. 
+Each row shows an input image alongside score maps produced by MSP, MaxLogit, MaxEntropy, 
+and RbA for EoMT-Cityscapes. Brighter regions indicate higher anomaly score; 
+ground-truth anomaly contours are overlaid in green.}
+\label{fig:step8}
+\end{figure*}
+
+\subsection{Temperature Scaling Study}
+\label{sec:temperature}
+
+For temperature scaling we tried $T \in \{0.5, 0.75, 1.0, 1.1, 1.5, 2.0\}$ on MSP, MaxEntropy, and RbA for EoMT-Cityscapes, EoMT-Fine-tuned, and ERFNet.
+Full per-model results are reported in Tables~\ref{tab:temp_eomt_cityscapes}, \ref{tab:temp_eomt_finetuned}, and \ref{tab:temp_erfnet}.
+Main finding that AuPRC is mostly stable across $T$.
+\begin{itemize}
+    \item In EoMT-Cityscapes (Table~\ref{tab:temp_eomt_cityscapes}), MSP AuPRC on RA-21 stays in a 0.3\% window, and MaxEntropy stays in a 0.5\% window.
+    \item In EoMT-Fine-tuned (Table~\ref{tab:temp_eomt_finetuned}), It follows similar pattern as EoMT-Cityscapes
+    \item In ERFNet (Table~\ref{tab:temp_erfnet}), MSP on RA-21 has a change range for 3\%, but its AuPRC is so low that the gain is not meaningful. 
+\end{itemize}
+
+\input{results/tables/latex_tables/eomt_cityscapes_temperature_table.tex}
+
+Interesting finding that RbA's AuPRC is stable, but its FPR95 swings with T:
+\begin{itemize}
+    \item EoMT-Cityscapes RbA on FS L\&F: FPR95=67.27 at T=0.5 vs 8.79 at T=1.0
+    \item EoMT-Cityscapes RbA on RoadAnomaly: FPR95's score increases from 20.41 at T=1.0 to 17.96 at T=2.0.
+    \item EoMT-Fine-tuned RbA on RoadAnomaly: FPR95 = 81.57 at T=0.5 vs 12.09 at T=2.0
+\end{itemize}
+
+\input{results/tables/latex_tables/eomt_fine_tuned_temperature_table.tex}
+\input{results/tables/latex_tables/erfnet_temperature_table.tex}
+
+As result, we found that T=1.0 is competitive for AuPRC most of all settings. Temperature scaling does not meaningfully improve AuPRC.
+Temperature scaling can shift the FPR95 results, especially for RbA, but it is not a consistent gain.
+Post-hoc temperature calibration is not a reliable method for improving anomaly segmentation on these benchmarks.

@@ -1,0 +1,35 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\paragraph{Mask-based architectures help anomaly detection.}
+\todo{Summarize the central empirical finding.}  
+% e.g., "Our results show that EoMT consistently outperforms ERFNet on most 
+% anomaly benchmarks, supporting the hypothesis that mask classification 
+% provides a stronger inductive bias for detecting out-of-distribution regions."
+
+\todo{Explain why, briefly.}  
+% e.g., "Because each query in EoMT learns a near-independent one-vs-all 
+% classifier, regions claimed by no query produce a clean rejection signal — 
+% something a per-pixel softmax model cannot replicate."
+
+\paragraph{Fine-tuning recovers most of the closed-set gap.}
+\todo{State the main fine-tuning finding.}  
+% "Fine-tuning EoMT-COCO on Cityscapes closes most of the mIoU gap to native 
+% training (XX.XX\% vs YY.YY\%) and brings anomaly detection performance to 
+% a comparable level, even with a frozen backbone and 20 epochs of training."
+
+\todo{Comment on efficiency.}  
+% "This suggests that broad pre-training on COCO transfers efficiently to 
+% road scenes, and full backbone updates are not required."
+
+\paragraph{Limitations.}
+\todo{Acknowledge limits.}  
+% Two or three things: small compute budget (Colab L4, ~20 epochs only); 
+% smaller evaluation subsets than the full benchmarks; no outlier-supervised 
+% baselines (PEBAL, DenseHybrid) for comparison. RbA has high FPR@95 trade-off.
+
+\paragraph{Future work.}
+\todo{One or two directions.}  
+% e.g., "Extending fine-tuning to unfrozen backbone training, evaluating 
+% on the full benchmark splits, and combining post-hoc scores with light 
+% outlier exposure are natural next steps."
