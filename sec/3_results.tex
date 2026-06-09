@@ -1,33 +1,11 @@
 \section{Results}
 
-We evaluated closed-set semantic segmentation on Cityscapes validation datasets, and anomaly segmentation on 5 benchmarks.
-Our findings include that mask-based EoMT model outperforms the pixel-based ERFNet on both tasks.
-Another interesting point that fine-tuning on COCO-EoMT improves mIoU result but degrades anomaly performance.
-As last, temperature scaling has limited effect on the anomaly metrics for this task.
+We evaluated closed-set semantic segmentation on Cityscapes validation datasets,
+and anomaly segmentation on 5 benchmarks.
 
 \subsection{Semantic Segmentation}
 
-\begin{table}[!tp]
-\centering
-\caption{Closed-set semantic segmentation results on \texttt{Cityscapes validation dataset} (mIoU \%). 
-EoMT-COCO is evaluated zero-shot with a class-mapping from COCO to Cityscapes. 
-EoMT-Fine-tuned originally come from EoMT-COCO and fine-tuned on Cityscapes.}
-\label{tab:semseg}
-\begin{tabular}{lc}
-\toprule
-Model & mIoU \\
-\midrule
-ERFNet & 72.50 \\
-EoMT-COCO (zero-shot) & 55.17 \\
-EoMT-Cityscapes & \textbf{81.68} \\
-EoMT-Fine-tuned & 78.85 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-As mentioned in the Table~\ref{tab:semseg}, 
-EoMT-Cityscapes is the strongest model with a score 81.68\% among the 
-compared model, and Fine-tuning substantially boost the mIoU.
+As mentioned in the Table~\ref{tab:anomaly_results}, EoMT-Cityscapes is the strongest model with a score 81.68\% among the compared model, and Fine-tuning substantially boost the mIoU.
 Beside them ERFNet's 72.50 score is competitive for a pixel-based model.
 Qualitative predictions for these models are shown in Figure~\ref{fig:step4}.
 
