@@ -130,6 +130,8 @@ ground-truth anomaly contours are overlaid in green.}
 \subsection{Temperature Scaling Study}
 \label{sec:temperature}
 
+\input{results/tables/latex_tables/combined_temperature_table.tex}
+
 For temperature scaling we tried $T \in \{0.5, 0.75, 1.0, 1.1, 1.5, 2.0\}$ on MSP, MaxEntropy, and RbA for EoMT-Cityscapes, EoMT-Fine-tuned, and ERFNet.
 Full per-model results are reported in Tables~\ref{tab:temperature_combined}.
 Main finding that AuPRC is mostly stable across $T$.
@@ -142,12 +144,10 @@ Main finding that AuPRC is mostly stable across $T$.
 Interesting finding that RbA's AuPRC is stable, but its FPR95 swings with T:
 \begin{itemize}
     \item EoMT-Cityscapes RbA on FS L\&F: FPR95=67.27 at T=0.5 vs 8.79 at T=1.0
-    \item EoMT-Cityscapes RbA on RoadAnomaly: FPR95's score increases from 20.41 at T=1.0 to 17.96 at T=2.0.
+    \item EoMT-Cityscapes RbA on RoadAnomaly: FPR95's score decreases from 20.41 at T=1.0 to 17.96 at T=2.0.
     \item EoMT-Fine-tuned RbA on RoadAnomaly: FPR95 = 81.57 at T=0.5 vs 12.09 at T=2.0
 \end{itemize}
 
 As result, we found that T=1.0 is competitive for AuPRC most of all settings. Temperature scaling does not meaningfully improve AuPRC.
 Temperature scaling can shift the FPR95 results, especially for RbA, but it is not a consistent gain.
 Post-hoc temperature calibration is not a reliable method for improving anomaly segmentation on these benchmarks.
-
-\input{results/tables/latex_tables/combined_temperature_table.tex}\FloatBarrier
