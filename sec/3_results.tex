@@ -1,13 +1,10 @@
-
-
-
 \section{Results}
 Semantic, and anomaly segmentation evaluated on Cityscapes val and five benchmarks sequentially.
 
 \subsection{Semantic Segmentation}
 EoMT-Cityscapes is the best model with 81.68\% mIoU among the compared model. Beside them ERFNet (72.50\%) is competitive for a pixel-based model.
 
-\begin{table}[!t]
+\begin{table}[!htbp]
 \centering
 \small
 \caption{Per-class IoU (\%) on \texttt{Cityscapes val}: EoMT-COCO (zero-shot with class mapping) 
@@ -46,9 +43,9 @@ EoMT-COCO scores 0\% IoU on \texttt{pole, rider}, and near-0\% on \texttt{traffi
 It is not the problem of the model but a label space mismatch. It is the motivation for fine-tuning.
 Fine-tuning lifts mIoU from 55.17 to 78.85, recovers the most of the gap. This result shows that COCO's DINOv2-backed visual priors work well, the only problem was the classification head, not the features.
 
+\input{results/tables/latex_tables/result_table.tex}
 
 \subsection{Anomaly Segmentation}
-\input{results/tables/latex_tables/result_table.tex}
 
 \paragraph{Pixel-based vs mask-based.}
 
