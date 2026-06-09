@@ -7,7 +7,7 @@ As last, temperature scaling has limited effect on the anomaly metrics for this 
 
 \subsection{Semantic Segmentation}
 
-\begin{table}[!htbp]
+\begin{table}[!tp]
 \centering
 \caption{Closed-set semantic segmentation results on \texttt{Cityscapes validation dataset} (mIoU \%). 
 EoMT-COCO is evaluated zero-shot with a class-mapping from COCO to Cityscapes. 
@@ -31,7 +31,7 @@ compared model, and Fine-tuning substantially boost the mIoU.
 Beside them ERFNet's 72.50 score is competitive for a pixel-based model.
 Qualitative predictions for these models are shown in Figure~\ref{fig:step4}.
 
-\begin{figure*}[!htbp]
+\begin{figure*}[!tp]
 \centering
 \includegraphics[width=\linewidth]{results/figures/step4/step4_comparison.png}
 \caption{Semantic segmentation results for EoMT-COCO and EoMT-Cityscapes. Left to right: original driving scenes, the ideal color-coded
@@ -39,7 +39,7 @@ target maps, and the actual pixel-level predictions made by the models.}
 \label{fig:step4}
 \end{figure*}
 
-\begin{table}[!htbp]
+\begin{table}[!tp]
 \centering
 \small
 \caption{Per-class IoU (\%) on \texttt{Cityscapes validation dataset}: EoMT-COCO (zero-shot with class mapping) 
@@ -77,7 +77,7 @@ bicycle       & 73.34 & 81.27 \\
 As referenced in the Table~\ref{tab:perclass}, some classes have near or 0\% IoU score. 
 This happens because there is no equivalent class labels in COCO dataset, and COCO-EoMT can't classify them for this reason.
 It is not the problem of the model but a label space mismatch. This problem was the motivation for fine-tuning the COCO-EoMT on Cityscapes.
-Fine-tuning lifts mIoU from 55.17 to 78.85, which recovers the most of the gap which is only ~3\%. This result shows that
+Fine-tuning lifts mIoU from 55.17 to 78.85, recovers the most of the gap. This result shows that
 COCO's DINOv2-backed visual priors working well, the only problem was the classification head, not the features.
 
 \subsection{Anomaly Segmentation}
@@ -117,7 +117,7 @@ However, it also produces high score for FPR95, so it separates the outlier but 
 \paragraph{Qualitative results.}
 Figure~\ref{fig:step8} shows anomaly score maps for the four scoring methods on representative RoadAnomaly21 images.
 
-\begin{figure*}[!htbp]
+\begin{figure*}[!tp]
 \centering
 \includegraphics[width=\linewidth]{results/figures/step8/step8_anomaly_maps.png}
 \caption{Qualitative comparison of anomaly score maps on RoadAnomaly21. 
@@ -149,7 +149,7 @@ Interesting finding that RbA's AuPRC is stable, but its FPR95 swings with T:
 \end{itemize}
 
 \input{results/tables/latex_tables/eomt_fine_tuned_temperature_table.tex}
-\input{results/tables/latex_tables/erfnet_temperature_table.tex}
+\input{results/tables/latex_tables/erfnet_temperature_table.tex}\FloatBarrier
 
 As result, we found that T=1.0 is competitive for AuPRC most of all settings. Temperature scaling does not meaningfully improve AuPRC.
 Temperature scaling can shift the FPR95 results, especially for RbA, but it is not a consistent gain.

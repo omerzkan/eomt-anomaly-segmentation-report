@@ -1,6 +1,12 @@
 \begin{abstract}
 
-Semantic and anomaly segmentation is critical for autonomous driving. But predefined-class models fail on the unknown objects, and it creates danger in the real world scenarios. We evaluate EoMT (encoder-only mask transformer with DINOv2 backbone) on semantic segmentation, and we compare COCO-trained EoMT (X\% mIoU) with Cityscapes-trained EoMT (X\% mIoU) on Cityscapes validation dataset. We fine-tune the COCO-EoMT on Cityscapes which reaches to X\% mIoU. For anomaly segmentation, we compare ERFNet and EoMT models using four post-hoc scoring methods which are MSP, MaxLogit, MaxEntropy, and RbA on 5 different datasets. Our findings show that EoMT-Cityscapes with MSP reaches X\% AuPRC on RoadAnomaly21, and RbA helps lowering false positive rates. Our code is available at \url{https://github.com/omerzkan/eomt-anomaly-segmentation.git}.
+Semantic and anomaly segmentation is critical for autonomous driving. 
+But predefined-class models fail on the unknown objects, and it creates danger in the real world scenarios. 
+We evaluate EoMT (encoder-only mask transformer with DINOv2 backbone) on semantic segmentation, and we compare COCO-trained EoMT (55.17\% mIoU) with Cityscapes-trained EoMT (81.68\% mIoU) on Cityscapes validation dataset. 
+We fine-tune the COCO-EoMT on Cityscapes which reaches to 78.85\% mIoU. 
+For anomaly segmentation, we compare ERFNet and EoMT models using four post-hoc scoring methods which are MSP, MaxLogit, MaxEntropy, and RbA on 5 different datasets. 
+Our findings show that EoMT-Cityscapes with MSP reaches 74.36\% AuPRC on RoadAnomaly21, and RbA helps lowering false positive rates. 
+Our code is available at \url{https://github.com/omerzkan/eomt-anomaly-segmentation.git}.
 
 \end{abstract}
 

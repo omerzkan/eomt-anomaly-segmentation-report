@@ -2,34 +2,29 @@
 \label{sec:discussion}
 
 \paragraph{Mask-based architectures help anomaly detection.}
-\todo{Summarize the central empirical finding.}  
-% e.g., "Our results show that EoMT consistently outperforms ERFNet on most 
-% anomaly benchmarks, supporting the hypothesis that mask classification 
-% provides a stronger inductive bias for detecting out-of-distribution regions."
 
-\todo{Explain why, briefly.}  
-% e.g., "Because each query in EoMT learns a near-independent one-vs-all 
-% classifier, regions claimed by no query produce a clean rejection signal — 
-% something a per-pixel softmax model cannot replicate."
+Results show us that EoMT performs much better than ERFNet on anomaly detection.
+On RA-21, EoMT achieves 74.36 AuPRC when ERFNet is only 38.31.
+Similar Things are observed on RO-21 (90.11 vs 4.63) and RoadAnomaly (78.14 vs 15.58).
+Possible reason for this result is that EoMT uses object queries. Each query behaves like an classifier.
+On the other hand, pixel-wise classifiers assign each pixel to a known class, and it makes anomaly detection harder.
 
 \paragraph{Fine-tuning recovers most of the closed-set gap.}
-\todo{State the main fine-tuning finding.}  
-% "Fine-tuning EoMT-COCO on Cityscapes closes most of the mIoU gap to native 
-% training (XX.XX\% vs YY.YY\%) and brings anomaly detection performance to 
-% a comparable level, even with a frozen backbone and 20 epochs of training."
 
-\todo{Comment on efficiency.}  
-% "This suggests that broad pre-training on COCO transfers efficiently to 
-% road scenes, and full backbone updates are not required."
+Fine tuning substantially increase the performance of EoMT-COCO. 
+The mIoU increases from 55.17 to 78.85. It almost closes the performance gap with EoMT-Cityscapes which has a mIoU score of 81.68.
+In the fine-tuning, the biggest advantage is that only the segmentation head and object queries were trained, while the backbone left frozen.
+For training, 20 epochs on a sing NVIDIA L4 GPU used. However, even if it increase the mIoU score, at the same time it reduces the anomaly detection performance.
+For example, the MSP score on RA-21 drops from 74.36 to 57.15. 
+This showed us a trade-off between semantic segmentation performance and anomaly detection capability.
 
 \paragraph{Limitations.}
-\todo{Acknowledge limits.}  
-% Two or three things: small compute budget (Colab L4, ~20 epochs only); 
-% smaller evaluation subsets than the full benchmarks; no outlier-supervised 
-% baselines (PEBAL, DenseHybrid) for comparison. RbA has high FPR@95 trade-off.
+
+In this project we had several limitations. The main limitation was limited computational sources. 
+We only used Colab environment for evaluation and training, which allows limited GPU power, only 20 training epochs and no backbone fine-tuning.
+Since RbA achieves strong AuPRC, this observation indicates room for improvement.
 
 \paragraph{Future work.}
-\todo{One or two directions.}  
-% e.g., "Extending fine-tuning to unfrozen backbone training, evaluating 
-% on the full benchmark splits, and combining post-hoc scores with light 
-% outlier exposure are natural next steps."
+
+Several improvements can be done in future work. One option is to unfreeze the backbone layers to improve accuracy. 
+Also, evaluating the approaches on a copmlete benchmarks would provide more convenient performance and results.
