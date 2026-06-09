@@ -1,35 +1,23 @@
 \section{Results}
+
 \subsection{Semantic Segmentation}
 EoMT-Cityscapes is the best model with 81.68\% mIoU among the compared model. Beside them ERFNet (72.50\%) is competitive for a pixel-based model.
 
 \begin{table}[!htbp]
 \centering
 \small
-\caption{Per-class IoU (\%) on \texttt{Cityscapes val}: EoMT-COCO (zero-shot with class mapping) 
-vs EoMT-Cityscapes.}
+\caption{Selected per-class IoU (\%) on \texttt{Cityscapes val}. EoMT-COCO scores 0\% on classes with no COCO equivalent.}
 \label{tab:perclass}
 \begin{tabular}{lcc}
 \toprule
 Class & EoMT-COCO & EoMT-Cityscapes \\
 \midrule
-road          & 94.13 & 98.40 \\
-sidewalk      & 64.81 & 87.36 \\
-building      & 86.77 & 94.15 \\
-wall          & 46.20 & 66.07 \\
-fence         & 50.01 & 65.49 \\
 pole          & \textbf{0.00}  & 71.04 \\
-traffic light & 60.79 & 75.00 \\
-traffic sign  & \textbf{4.74}  & 82.13 \\
-vegetation    & 88.15 & 93.02 \\
-terrain       & 56.84 & 66.60 \\
-sky           & 89.73 & 95.54 \\
-person        & 70.51 & 85.38 \\
 rider         & \textbf{0.00}  & 71.11 \\
+traffic sign  & \textbf{4.74}  & 82.13 \\
+\midrule
+road          & 94.13 & 98.40 \\
 car           & 84.33 & 95.54 \\
-truck         & 29.37 & 81.78 \\
-bus           & 71.17 & 90.32 \\
-train         & 13.63 & 77.36 \\
-motorcycle    & 63.78 & 74.35 \\
 bicycle       & 73.34 & 81.27 \\
 \midrule
 \textbf{Mean} & \textbf{55.17} & \textbf{81.68} \\
@@ -41,13 +29,11 @@ EoMT-COCO scores 0\% IoU on \texttt{pole, rider}, and near-0\% on \texttt{traffi
 It is not the problem of the model but a label space mismatch. It is the motivation for fine-tuning.
 Fine-tuning lifts mIoU from 55.17 to 78.85, recovers the most of the gap. This result shows that COCO's DINOv2-backed visual priors work well, the only problem was the classification head, not the features.
 
-\input{results/tables/latex_tables/result_table.tex}
-
 \subsection{Anomaly Segmentation}
 
 \paragraph{Pixel-based vs mask-based.}
 
-In the Table~\ref{tab:anomaly_results}, we see these results from the comparison of ERFNet and EoMT:
+We see these results from the comparison of ERFNet and EoMT (Table~\ref{tab:temperature_combined}):
 \begin{itemize}
     \item On RoadAnomaly-21 dataset, ERFNet's MaxLogit is 38.31, and EoMT-Cityscapes' MaxEntropy is 77.88. There are 40 point difference
     \item On RoadObstacle-21 dataset, ERFNet's MaxLogit is 4.63 and EoMT-Cityscapes' MSP is 90.11. There are ~85\% difference
@@ -58,23 +44,19 @@ creates smooth shapes because it looks at the whole object at once. However, pix
 
 \paragraph{Effect of fine-tuning.}
 
-To see the effect of the fine-tuning, we compare the EoMT-Cityscapes with EoMT-Fine-tuned on AuPRC on the Table~\ref{tab:anomaly_results}.
+To see the effect of the fine-tuning, we compare the EoMT-Cityscapes with EoMT-Fine-tuned on AuPRC (Table~\ref{tab:temperature_combined}).
 \begin{itemize}
     \item On RoadAnomaly-21 dataset: MSP score drops from 74.36\% to 57.15\% (~17\% change)
     \item On RoadObstacle-21 dataset: MSP score drops from 90.11\% to 73.61\% (~16\% change)
     \item On RoadAnomaly dataset: MSP score drops from 75.69\% to 54.99\% (~21\% change)
     \item On FS L\&F dataset: MSP score increases from 25.42\% to 27.11\% (~2\% change)
 \end{itemize}
-According to these results, EoMT-COCO recovers closed set mIoU (Table~\ref{tab:anomaly_results}) but decrease the anomaly scores compared to training from scratch on Cityscapes.
+According to these results, EoMT-COCO recovers closed set mIoU (Table~\ref{tab:temperature_combined}) but decrease the anomaly scores compared to training from scratch on Cityscapes.
 This happens because training the model for a short time makes it hyper-focused on normal objects, and this ruins its ability to spot unusual things. 
 
 \paragraph{Comparison of scoring functions.}
-Interesting finding here is that MaxLogit beats MSP and MaxEntropy on ERFNet (38.31 vs 29.09 vs 30.96 on RA-21), but on EoMT they are almost same.
-This result shows that scoring-method choice depends on the architecture.
-RbA has a different pattern in here. It achieves highest AuPRC on FS L\&F (30.61) and FS Static (56.29) for EoMT-Fine-tuned. 
-However, it also produces high score for FPR95, so it separates the outlier but it is too sensitive so it makes a lot of false alarms.  
 
-\begin{figure}[!t]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\linewidth]{results/figures/step8/step8_anomaly_maps.png}
 \caption{Qualitative comparison of anomaly score maps on RoadAnomaly21. 
@@ -82,12 +64,19 @@ Each row shows an input image alongside score maps produced by MSP, MaxLogit,
 MaxEntropy, and RbA for EoMT-Cityscapes.}
 \label{fig:step8}
 \end{figure}
+
+Interesting finding here is that MaxLogit beats MSP and MaxEntropy on ERFNet (38.31 vs 29.09 vs 30.96 on RA-21), but on EoMT they are almost same.
+This result shows that scoring-method choice depends on the architecture.
+
+\input{results/tables/latex_tables/combined_temperature_table.tex}
+
+RbA has a different pattern in here. It achieves highest AuPRC on FS L\&F (30.61) and FS Static (56.29) for EoMT-Fine-tuned. 
+However, it also produces high score for FPR95, so it separates the outlier but it is too sensitive so it makes a lot of false alarms.  
+
 \paragraph{Qualitative results.}
 Figure~\ref{fig:step8} shows anomaly score maps for the four scoring methods on representative RoadAnomaly21 images.
 
 \subsection{Temperature Scaling Study}
-
-\input{results/tables/latex_tables/combined_temperature_table.tex}
 
 For temperature scaling, we tried $T \in \{0.5, 0.75, 1.0, 1.1, 1.5, 2.0\}$ on MSP, MaxEntropy, and RbA 
 for EoMT-Cityscapes, EoMT-Fine-tuned, and ERFNet.

@@ -2,6 +2,24 @@
 \label{sec:method}
 
 \subsection{Semantic Segmentation}
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Semantic segmentation results on \texttt{Cityscapes val} (mIoU \%). 
+EoMT-COCO is evaluated zero-shot with COCO$\rightarrow$Cityscapes class mapping. 
+EoMT-Fine-tuned starts from EoMT-COCO and is fine-tuned on Cityscapes.}
+\label{tab:semseg}
+\begin{tabular}{lc}
+\toprule
+Model & mIoU \\
+\midrule
+ERFNet                  & 72.50 \\
+EoMT-COCO (zero-shot)   & 55.17 \\
+EoMT-Cityscapes         & \textbf{81.68} \\
+EoMT-Fine-tuned         & 78.85 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 Semantic segmentation was our first task, and we used EoMT~\cite{eomt}, which is a mask-based architecture built on a DINOv2-pretrained Vision Transformer~\cite{dinov2}. 
 We compared two EoMT models using two different checkpoints: EoMT-COCO and EoMT-Cityscapes. EoMT-COCO is trained on the COCO dataset~\cite{coco}, a large general-purpose dataset with 118k training images covering daily scenes such as streets, kitchens, beaches, and animals. 
