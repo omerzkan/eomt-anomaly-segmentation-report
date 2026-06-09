@@ -5,16 +5,16 @@
 
 Semantic segmentation was our first task, and we used EoMT~\cite{eomt}, which is a mask-based architecture built on a DINOv2-pretrained Vision Transformer~\cite{dinov2}. Mask classification predicts a fixed set of $K$ masks with a class label for each mask. This idea was introduced by MaskFormer~\cite{maskformer} and improved by Mask2Former~\cite{mask2former}. EoMT removes the convolutional adapter and the pixel decoder, simplifying the mask-based pipeline. It only uses the pretrained ViT to extract features.
 
-We compared two EoMT models using two different checkpoints: EoMT-COCO and EoMT-Cityscapes. A checkpoint contains the model weights learned from a specific dataset, so the same architecture behaves differently depending on which checkpoint is loaded. EoMT-COCO is trained on the COCO dataset, a large general-purpose dataset with 118k training images covering daily scenes such as streets, kitchens, beaches, and animals. COCO has 133 class labels: 80 ``thing'' classes such as person, car, and dog, and 53 ``stuff'' classes such as sky, grass, wall, and sand. This makes the model strong on a wide range of visual objects, but it is not road-specific.
+We compared two EoMT models using two different checkpoints: EoMT-COCO and EoMT-Cityscapes. A checkpoint contains the model weights learned from a specific dataset, so the same architecture behaves differently depending on which checkpoint is loaded. EoMT-COCO is trained on the COCO dataset~\cite{coco}, a large general-purpose dataset with 118k training images covering daily scenes such as streets, kitchens, beaches, and animals. COCO has 133 class labels: 80 ``thing'' classes such as person, car, and dog, and 53 ``stuff'' classes such as sky, grass, wall, and sand. This makes the model strong on a wide range of visual objects, but it is not road-specific.
 
-The second model is EoMT-Cityscapes, trained on the Cityscapes dataset. Cityscapes is a smaller dataset (around 3k training images) of road and driving scenes from German cities. It has 19 class labels specifically chosen for autonomous driving, such as road, sidewalk, building, pole, traffic light, traffic sign, person, rider, car, and bicycle. It is road-specific but not as broad as COCO.
+The second model is EoMT-Cityscapes, trained on the Cityscapes dataset~\cite{cityscapes}. Cityscapes is a smaller dataset (around 3k training images) of road and driving scenes from German cities. It has 19 class labels specifically chosen for autonomous driving, such as road, sidewalk, building, pole, traffic light, traffic sign, person, rider, car, and bicycle. It is road-specific but not as broad as COCO.
 
 We evaluated both models on the Cityscapes validation set, which contains 500 images. The goal was to understand how much a general model loses compared to a specialized one, and whether fine-tuning can close the gap. To do this, we had to solve one problem: EoMT-Cityscapes has 19 output channels matching the 19 Cityscapes classes, while EoMT-COCO has 133 output channels matching the 133 COCO classes. We had to translate the COCO predictions into the Cityscapes label space before evaluation.
 
 We built a \texttt{coco\_to\_cityscapes.py} mapping that works in three steps:
 \begin{itemize}
     \item \textbf{Direct name match:} obvious matches found by string comparison. For example, COCO ``car'' maps directly to Cityscapes ``car'', and COCO ``person'' to Cityscapes ``person''.
-    \item \textbf{Synonyms:} some classes are named differently in the two datasets. We built a synonym dictionary to handle these cases. For example, COCO calls sidewalks ``pavement-merged''.
+    \item \textbf{Synonyms:} some classes are named differently in the two datasets. We built a synonym dictionary to handle these cases. For example, COCO includes sidewalks in ``pavement-merged''.
     \item \textbf{Ignored:} COCO labels with no Cityscapes equivalent are mapped to the ignore index 255, which excludes them from evaluation. For example, if EoMT-COCO predicts ``dog'', that pixel is ignored.
 \end{itemize}
 
@@ -57,12 +57,12 @@ For evaluating the models, we consider four scoring methods.
     \text{score}_{\text{MSP}}(\mathbf{x}) = 1 - \max_c p_c(\mathbf{x})
     \end{equation}
     
-    \item \textbf{MaxLogit:} uses the raw logits before softmax, because they preserve the magnitude of the model's confidence.
+    \item \textbf{MaxLogit}~\cite{maxlogit}: uses the raw logits before softmax, because they preserve the magnitude of the model's confidence.
     \begin{equation}
     \text{score}_{\text{MaxLogit}}(\mathbf{x}) = -\max_c L_c(\mathbf{x})
     \end{equation}
     
-    \item \textbf{MaxEntropy:} if the probability is spread across many classes (high entropy), the model is uncertain and the pixel is a possible anomaly. If it puts all probability on one class (low entropy), the model is confident.
+    \item \textbf{MaxEntropy}~\cite{maxentropy}: if the probability is spread across many classes (high entropy), the model is uncertain and the pixel is a possible anomaly. If it puts all probability on one class (low entropy), the model is confident.
     \begin{equation}
     \text{score}_{\text{Entropy}}(\mathbf{x}) = -\sum_{c=1}^{C} p_c(\mathbf{x}) \log p_c(\mathbf{x})
     \end{equation}

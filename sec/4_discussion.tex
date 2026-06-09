@@ -6,15 +6,15 @@
 Results show us that EoMT performs much better than ERFNet on anomaly detection.
 On RA-21, EoMT achieves 74.36 AuPRC when ERFNet is only 38.31.
 Similar Things are observed on RO-21 (90.11 vs 4.63) and RoadAnomaly (78.14 vs 15.58).
-Possible reason for this result is that EoMT uses object queries. Each query behaves like an classifier.
+Possible reason for this result is that EoMT uses object queries. Each query behaves like a classifier.
 On the other hand, pixel-wise classifiers assign each pixel to a known class, and it makes anomaly detection harder.
 
 \paragraph{Fine-tuning recovers most of the closed-set gap.}
 
-Fine tuning substantially increase the performance of EoMT-COCO. 
+Fine tuning substantially increases the performance of EoMT-COCO. 
 The mIoU increases from 55.17 to 78.85. It almost closes the performance gap with EoMT-Cityscapes which has a mIoU score of 81.68.
 In the fine-tuning, the biggest advantage is that only the segmentation head and object queries were trained, while the backbone left frozen.
-For training, 20 epochs on a sing NVIDIA L4 GPU used. However, even if it increase the mIoU score, at the same time it reduces the anomaly detection performance.
+For training, 20 epochs with NVIDIA L4 GPU used. However, even if it increase the mIoU score, at the same time it reduces the anomaly detection performance.
 For example, the MSP score on RA-21 drops from 74.36 to 57.15. 
 This showed us a trade-off between semantic segmentation performance and anomaly detection capability.
 
@@ -27,4 +27,4 @@ Since RbA achieves strong AuPRC, this observation indicates room for improvement
 \paragraph{Future work.}
 
 Several improvements can be done in future work. One option is to unfreeze the backbone layers to improve accuracy. 
-Also, evaluating the approaches on a copmlete benchmarks would provide more convenient performance and results.
+Also, evaluating the approaches on a complete benchmarks would provide more comprehensive performance and results.
