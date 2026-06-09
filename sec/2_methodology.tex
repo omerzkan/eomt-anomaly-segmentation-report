@@ -45,10 +45,10 @@ Mean IoU (mIoU) is the average of these scores.
 
 \subsection{Fine-Tuning} 
 We wanted to see if we could adapt it to the Cityscapes domain without losing its general knowledge.
-For fine tuning drop the classification head because COCO's classification head produces 133 logits per query. We replaced it with a new head that has 19 outputs which is one per Cityscapes class.
+For fine tuning, we drop the classification head because COCO's classification head produces 133 logits per query. We replaced it with a new head that has 19 outputs which is one per Cityscapes class.
 The rest of the weights are kept frozen.
 For efficiency, we froze the DINOv2 backbone and trained the queries, and the new classification head. 
-We also use Automatic Mixed Precision (AMP). Instead of FP32, we use mixed-precision FP16.
+We also use Automatic Mixed Precision (AMP). Instead of only FP32, we use mixed-precision.
 For the training setup $20$ epochs, $K=200$ queries, image size $640{\times}640$ used. 
 Training was done on a single NVIDIA L4 GPU via Google Colab Pro.
 For the loss function we used standard Mask2Former~\cite{mask2former} loss.

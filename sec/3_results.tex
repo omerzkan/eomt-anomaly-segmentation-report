@@ -35,11 +35,11 @@ Fine-tuning lifts mIoU from 55.17 to 78.85, recovers the most of the gap. This r
 
 We see these results from the comparison of ERFNet and EoMT (Table~\ref{tab:temperature_combined}):
 \begin{itemize}
-    \item On RoadAnomaly-21 dataset, ERFNet's MaxLogit is 38.31, and EoMT-Cityscapes' MaxEntropy is 77.88. There are 40 point difference
-    \item On RoadObstacle-21 dataset, ERFNet's MaxLogit is 4.63 and EoMT-Cityscapes' MSP is 90.11. There are ~85\% difference
-    \item On RoadAnomaly dataset, ERFNet's MaxLogit 15.58 and EoMT-Cityscapes' MaxEntropy 78.14. There are ~63\% difference
+    \item On RoadAnomaly-21 dataset, ERFNet's MaxLogit is 38.31, and EoMT-Cityscapes' MaxEntropy is 77.88. There is a 40\% point difference
+    \item On RoadObstacle-21 dataset, ERFNet's MaxLogit is 4.63 and EoMT-Cityscapes' MSP is 90.11. There is a 85\% point difference
+    \item On RoadAnomaly dataset, ERFNet's MaxLogit 15.58 and EoMT-Cityscapes' MaxEntropy 78.14. There is a 63\% point difference
 \end{itemize}
-With these results, we find that on most benchmarks, the EoMT's models substantially outperform the ERFNet. Because mask-based classification 
+With these results, we find that on most benchmarks, the EoMT's models substantially outperform the ERFNet. Mask-based classification 
 creates smooth shapes because it looks at the whole object at once. However, pixel-softmax looks at each pixel one by one, that's why it is vulnerable to noise.
 
 \paragraph{Effect of fine-tuning.}
@@ -51,10 +51,8 @@ To see the effect of the fine-tuning, we compare the EoMT-Cityscapes with EoMT-F
     \item On RoadAnomaly dataset: MSP score drops from 75.69\% to 54.99\% (~21\% change)
     \item On FS L\&F dataset: MSP score increases from 25.42\% to 27.11\% (~2\% change)
 \end{itemize}
-According to these results, EoMT-COCO recovers closed set mIoU (Table~\ref{tab:temperature_combined}) but decrease the anomaly scores compared to training from scratch on Cityscapes.
+According to these results, EoMT-Fine-tuned recovers closed set mIoU (Table~\ref{tab:temperature_combined}) but decrease the anomaly scores compared to training from scratch on Cityscapes.
 This happens because training the model for a short time makes it hyper-focused on normal objects, and this ruins its ability to spot unusual things. 
-
-\paragraph{Comparison of scoring functions.}
 
 \begin{figure}[!htbp]
 \centering
@@ -64,7 +62,7 @@ Each row shows an input image alongside score maps produced by MSP, MaxLogit,
 MaxEntropy, and RbA for EoMT-Cityscapes.}
 \label{fig:step8}
 \end{figure}
-
+\paragraph{Comparison of scoring functions.}
 Interesting finding here is that MaxLogit beats MSP and MaxEntropy on ERFNet (38.31 vs 29.09 vs 30.96 on RA-21), but on EoMT they are almost same.
 This result shows that scoring-method choice depends on the architecture.
 
@@ -73,8 +71,9 @@ This result shows that scoring-method choice depends on the architecture.
 RbA has a different pattern in here. It achieves highest AuPRC on FS L\&F (30.61) and FS Static (56.29) for EoMT-Fine-tuned. 
 However, it also produces high score for FPR95, so it separates the outlier but it is too sensitive so it makes a lot of false alarms.  
 
-\paragraph{Qualitative results.}
-Figure~\ref{fig:step8} shows anomaly score maps for the four scoring methods on representative RoadAnomaly21 images.
+
+%\paragraph{Qualitative results.}
+%Figure~\ref{fig:step8} shows anomaly score maps for the four scoring methods on representative RoadAnomaly21 images.
 
 \subsection{Temperature Scaling Study}
 
