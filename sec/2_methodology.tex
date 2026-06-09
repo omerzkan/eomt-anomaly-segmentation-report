@@ -3,22 +3,22 @@
 
 \subsection{Semantic Segmentation}
 
-Semantic segmentation was our first task, and we used EoMT~\cite{eomt}, which is a mask-based architecture built on a DINOv2-pretrained Vision Transformer~\cite{dinov2}. Mask classification predicts a fixed set of $K$ masks with a class label for each mask. This idea was introduced by MaskFormer~\cite{maskformer} and improved by Mask2Former~\cite{mask2former}. EoMT removes the convolutional adapter and the pixel decoder, simplifying the mask-based pipeline. It only uses the pretrained ViT to extract features.
-
-We compared two EoMT models using two different checkpoints: EoMT-COCO and EoMT-Cityscapes. A checkpoint contains the model weights learned from a specific dataset, so the same architecture behaves differently depending on which checkpoint is loaded. EoMT-COCO is trained on the COCO dataset~\cite{coco}, a large general-purpose dataset with 118k training images covering daily scenes such as streets, kitchens, beaches, and animals. COCO has 133 class labels: 80 ``thing'' classes such as person, car, and dog, and 53 ``stuff'' classes such as sky, grass, wall, and sand. This makes the model strong on a wide range of visual objects, but it is not road-specific.
-
-The second model is EoMT-Cityscapes, trained on the Cityscapes dataset~\cite{cityscapes}. Cityscapes is a smaller dataset (around 3k training images) of road and driving scenes from German cities. It has 19 class labels specifically chosen for autonomous driving, such as road, sidewalk, building, pole, traffic light, traffic sign, person, rider, car, and bicycle. It is road-specific but not as broad as COCO.
-
-We evaluated both models on the Cityscapes validation set, which contains 500 images. The goal was to understand how much a general model loses compared to a specialized one, and whether fine-tuning can close the gap. To do this, we had to solve one problem: EoMT-Cityscapes has 19 output channels matching the 19 Cityscapes classes, while EoMT-COCO has 133 output channels matching the 133 COCO classes. We had to translate the COCO predictions into the Cityscapes label space before evaluation.
-
+Semantic segmentation was our first task, and we used EoMT~\cite{eomt}, which is a mask-based architecture built on a DINOv2-pretrained Vision Transformer~\cite{dinov2}. 
+We compared two EoMT models using two different checkpoints: EoMT-COCO and EoMT-Cityscapes. EoMT-COCO is trained on the COCO dataset~\cite{coco}, a large general-purpose dataset with 118k training images covering daily scenes such as streets, kitchens, beaches, and animals. 
+COCO has 133 class labels: 80 ``thing'' classes such as person, car, and dog, and 53 ``stuff'' classes such as sky, grass, wall, and sand. 
+This makes the model strong on a wide range of visual objects, but it is not road-specific.
+The second model is EoMT-Cityscapes, trained on the Cityscapes dataset~\cite{cityscapes}. Cityscapes is a smaller dataset (around 3k training images) of road and driving scenes from German cities. 
+It has 19 class labels specifically chosen for autonomous driving, such as road, sidewalk, building, pole, traffic light, traffic sign, person, rider, car, and bicycle. 
+It is road-specific but not as broad as COCO.
+We evaluated both models on the Cityscapes validation set, which contains 500 images. 
+The goal was to understand how much a general model loses compared to a specialized one, and whether fine-tuning can close the gap. 
+We need to translate the COCO predictions into the Cityscapes label space before evaluation.
 We built a \texttt{coco\_to\_cityscapes.py} mapping that works in three steps:
 \begin{itemize}
     \item \textbf{Direct name match:} obvious matches found by string comparison. For example, COCO ``car'' maps directly to Cityscapes ``car'', and COCO ``person'' to Cityscapes ``person''.
     \item \textbf{Synonyms:} some classes are named differently in the two datasets. We built a synonym dictionary to handle these cases. For example, COCO includes sidewalks in ``pavement-merged''.
     \item \textbf{Ignored:} COCO labels with no Cityscapes equivalent are mapped to the ignore index 255, which excludes them from evaluation. For example, if EoMT-COCO predicts ``dog'', that pixel is ignored.
 \end{itemize}
-
-
 
 For each of the 19 Cityscapes classes we compute the Intersection-over-Union (IoU):
 \begin{equation}
@@ -27,29 +27,22 @@ For each of the 19 Cityscapes classes we compute the Intersection-over-Union (Io
 \end{equation}
 The mean IoU (mIoU) is the average over the 19 classes. It treats every class equally, so rare classes count as much as common ones.
 
-\subsection{Fine-Tuning}
-In fine-tuning, we take a model which is already trained on a dataset and continue training on a 
-new dataset while keeping the useful information from previous trainings. 
-We chose fine-tuning because EoMT-COCO is broad and powerful, but not road-specific. 
+\subsection{Fine-Tuning} 
 We wanted to see if we could adapt it to the Cityscapes domain without losing its general knowledge.
-
-When fine-tuning EoMT-COCO, we dropped the classification head because COCO's classification 
-head produces 133 logits per query, one per COCO class. We replaced it with a new head that has 19 outputs which is one per Cityscapes class.
-The rest of the weights are kept from the EoMT-COCO. 
-For efficiency, we froze the DINOv2 backbone and trained only the queries, mask module, and the new classification head. 
+For fine tuning drop the classification head because COCO's classification head produces 133 logits per query. We replaced it with a new head that has 19 outputs which is one per Cityscapes class.
+The rest of the weights are kept frozen.
+For efficiency, we froze the DINOv2 backbone and trained the queries, and the new classification head. 
 We also use Automatic Mixed Precision (AMP). Instead of FP32, we use mixed-precision FP16.
-For the training setup we used $20$ epochs, $K=200$ queries, image size $640{\times}640$. 
+For the training setup $20$ epochs, $K=200$ queries, image size $640{\times}640$ used. 
 Training was done on a single NVIDIA L4 GPU via Google Colab Pro.
 For the loss function we used standard Mask2Former~\cite{mask2former} loss.
-It combines Hungarian matching between predicted and ground-truth masks, with cross-entropy on classes and Dice + binary cross-entropy on masks.
 We use AdamW with a learning rate of $1\times10^{-4}$.
 
 \subsection{Anomaly Segmentation}
 We evaluate ERFNet and EoMT under anomaly segmentation.
-Anomaly segmentation detects pixels belonging to objects which are not found in the training class set. We can say that these pixels are out-of-distribution.
-For evaluation, we use post-hoc methods which use model's class logits, do not require retraining, and calculate anomaly score per pixel. 
+Anomaly segmentation detects pixels belonging to objects which are not found in the training class set, out-of-distribution.
+For evaluation, we use post-hoc methods which use class logits, and calculate anomaly score per pixel. 
 Both ERFNet (pixel-based) and EoMT (mask-based) produce class logits, and this allows us to use the same scoring functions for both models.
-For evaluating the models, we consider four scoring methods.
 \paragraph{Post-hoc anomaly detection methods.}
 \begin{itemize}
     \item \textbf{MSP (Maximum Softmax Probability):} uses the highest softmax probability as an uncertainty indicator.
@@ -67,11 +60,11 @@ For evaluating the models, we consider four scoring methods.
     \text{score}_{\text{Entropy}}(\mathbf{x}) = -\sum_{c=1}^{C} p_c(\mathbf{x}) \log p_c(\mathbf{x})
     \end{equation}
     
-    \item \textbf{RbA (Reweighted by Area)~\cite{rba}:} only for mask-based models. It does not work with ERFNet~\cite{erfnet}. 
-    RbA flags pixels that are not strongly claimed by any mask. RbA relies on an independence assumption: in a mask architecture, 
+    \item \textbf{RbA (Reweighted by Area)~\cite{rba}:} Only for mask-based models. RbA flags pixels that are not strongly claimed by any mask. 
+    It relies on an independence assumption. In a mask architecture, 
     each class behaves like a one-vs-all classifier, so class probabilities do not need to sum to 1.
-    In a pixel-wise classifier like ERFNet, the class probabilities must sum to 1.
-    The independence assumption is violated, and RbA doesn't have the same OoD-detection meaning. That's why we don't apply RbA to ERFNet.
+    In a pixel-wise classifier, the class probabilities must sum to 1, it violates the independence assumption, and RbA loses the OoD-detection meaning.
+    That's why we don't apply RbA to ERFNet.
     \begin{equation}
     \text{score}_{\text{RbA}}(\mathbf{x}) = -\sum_{c=1}^{C} \tanh(L_c(\mathbf{x}))
     \end{equation}
@@ -82,7 +75,7 @@ For evaluating the models, we consider four scoring methods.
 
 It is a calibration technique that can shift recall and precision in anomaly detection.
 It divides logits by $T$ before softmax. $T > 1$ makes probabilities more uncertain, $T < 1$ makes them more confident. 
-We tested $T \in \{0.5, 0.75, 1.0, 1.1, 1.5, 2.0\}$ on MSP, MaxEntropy, and RbA. We didn't test on MaxLogit, which doesn't use softmax.
+We tested $T \in \{0.5, 0.75, 1.0, 1.1, 1.5, 2.0\}$ on MSP, MaxEntropy, and RbA. We didn't test on MaxLogit, because it doesn't use softmax.
 
 \paragraph{Datasets and metrics.}
 
@@ -99,6 +92,6 @@ As evaluation benchmarks, we use a smaller subsets of these five datasets which 
 \end{itemize}
 We use two metrics:
 \begin{itemize}
-    \item \textbf{AuPRC} (Area under the Precision-Recall Curve): Evaluates pixel-level separability. Higher values mean better discrimination of rare anomalies.
+    \item \textbf{AuPRC} (Area under the Precision-Recall Curve): Evaluates pixel-level separability. Higher values mean better, used for discrimination of rare anomalies.
     \item \textbf{FPR@95} (False Positive Rate at 95\% True Positive Rate): Measures false positive rate when the true positive rate is fixed at 95\%. It is a safety critical metric. Lower is better.
 \end{itemize}

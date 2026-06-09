@@ -2,28 +2,16 @@
 
 
 \section{Results}
-We evaluated closed-set semantic segmentation on Cityscapes validation datasets, and anomaly segmentation on 5 benchmarks.
+Semantic, and anomaly segmentation evaluated on Cityscapes val and five benchmarks sequentially.
 
 \subsection{Semantic Segmentation}
-As mentioned in the Table~\ref{tab:anomaly_results}, EoMT-Cityscapes is the strongest model with a score 81.68\% among the compared model, and Fine-tuning substantially boost the mIoU.
-Beside them ERFNet's 72.50 score is competitive for a pixel-based model.
-
-\begin{comment}
-Qualitative predictions for these models are shown in Figure~\ref{fig:step4}.
-\begin{figure*}[!tp]
-\centering
-\includegraphics[width=\linewidth]{results/figures/step4/step4_comparison.png}
-\caption{Semantic segmentation results for EoMT-COCO and EoMT-Cityscapes. Left to right: original driving scenes, the ideal color-coded
-target maps, and the actual pixel-level predictions made by the models.}
-\label{fig:step4}
-\end{figure*}
-\end{comment}
+EoMT-Cityscapes is the best model with 81.68\% mIoU among the compared model. Beside them ERFNet (72.50\%) is competitive for a pixel-based model.
 
 \begin{table}[!t]
 \centering
 \small
-\caption{Per-class IoU (\%) on \texttt{Cityscapes validation dataset}: EoMT-COCO (zero-shot with class mapping) 
-versus EoMT-Cityscapes. EoMT-COCO scores 0\% on classes with no COCO equivalent.}
+\caption{Per-class IoU (\%) on \texttt{Cityscapes val}: EoMT-COCO (zero-shot with class mapping) 
+vs EoMT-Cityscapes.}
 \label{tab:perclass}
 \begin{tabular}{lcc}
 \toprule
@@ -54,14 +42,12 @@ bicycle       & 73.34 & 81.27 \\
 \end{tabular}
 \end{table}
 
-As referenced in the Table~\ref{tab:perclass}, some classes have near or 0\% IoU score. 
-This happens because there is no equivalent class labels in COCO dataset, and COCO-EoMT can't classify them for this reason.
-It is not the problem of the model but a label space mismatch. This problem was the motivation for fine-tuning the COCO-EoMT on Cityscapes.
-Fine-tuning lifts mIoU from 55.17 to 78.85, recovers the most of the gap. This result shows that
-COCO's DINOv2-backed visual priors work well, the only problem was the classification head, not the features.
+EoMT-COCO scores 0\% IoU on \texttt{pole, rider}, and near-0\% on \texttt{traffic sign}~\ref{tab:perclass} because COCO has no equivalent label.
+It is not the problem of the model but a label space mismatch. It is the motivation for fine-tuning.
+Fine-tuning lifts mIoU from 55.17 to 78.85, recovers the most of the gap. This result shows that COCO's DINOv2-backed visual priors work well, the only problem was the classification head, not the features.
+
 
 \subsection{Anomaly Segmentation}
-
 \input{results/tables/latex_tables/result_table.tex}
 
 \paragraph{Pixel-based vs mask-based.}
@@ -84,7 +70,6 @@ To see the effect of the fine-tuning, we compare the EoMT-Cityscapes with EoMT-F
     \item On RoadAnomaly dataset: MSP score drops from 75.69\% to 54.99\% (~21\% change)
     \item On FS L\&F dataset: MSP score increases from 25.42\% to 27.11\% (~2\% change)
 \end{itemize}
-
 According to these results, EoMT-COCO recovers closed set mIoU (Table~\ref{tab:anomaly_results}) but decrease the anomaly scores compared to training from scratch on Cityscapes.
 This happens because training the model for a short time makes it hyper-focused on normal objects, and this ruins its ability to spot unusual things. 
 
@@ -94,24 +79,13 @@ This result shows that scoring-method choice depends on the architecture.
 RbA has a different pattern in here. It achieves highest AuPRC on FS L\&F (30.61) and FS Static (56.29) for EoMT-Fine-tuned. 
 However, it also produces high score for FPR95, so it separates the outlier but it is too sensitive so it makes a lot of false alarms.  
 
-\paragraph{Qualitative results.}
-\begin{figure*}[!b]
-\centering
-\includegraphics[width=\linewidth]{results/figures/step8/step8_anomaly_maps.png}
-\caption{Qualitative comparison of anomaly score maps on RoadAnomaly21. 
-Each row shows an input image alongside score maps produced by MSP, MaxLogit, MaxEntropy, 
-and RbA for EoMT-Cityscapes. Brighter regions indicate higher anomaly score.}
-\label{fig:step8}
-\end{figure*}
-Figure~\ref{fig:step8} shows anomaly score maps for the four scoring methods on representative RoadAnomaly21 images.
-
 \subsection{Temperature Scaling Study}
-\label{sec:temperature}
 
 \input{results/tables/latex_tables/combined_temperature_table.tex}
 
-For temperature scaling we tried $T \in \{0.5, 0.75, 1.0, 1.1, 1.5, 2.0\}$ on MSP, MaxEntropy, and RbA for EoMT-Cityscapes, EoMT-Fine-tuned, and ERFNet.
-Full per-model results are reported in Tables~\ref{tab:temperature_combined}.
+For temperature scaling, we tried $T \in \{0.5, 0.75, 1.0, 1.1, 1.5, 2.0\}$ on MSP, MaxEntropy, and RbA 
+for EoMT-Cityscapes, EoMT-Fine-tuned, and ERFNet.
+Per-model results are reported in here~\ref{tab:temperature_combined}.
 Main finding that AuPRC is mostly stable across $T$.
 \begin{itemize}
     \item In EoMT-Cityscapes (Table~\ref{tab:temperature_combined}), MSP AuPRC on RA-21 stays in a 0.3\% window, and MaxEntropy stays in a 0.5\% window.
@@ -126,6 +100,17 @@ Interesting finding that RbA's AuPRC is stable, but its FPR95 swings with T:
     \item EoMT-Fine-tuned RbA on RoadAnomaly: FPR95 = 81.57 at T=0.5 vs 12.09 at T=2.0
 \end{itemize}
 
-As result, we found that T=1.0 is competitive for AuPRC most of all settings. Temperature scaling does not meaningfully improve AuPRC.
-Temperature scaling can shift the FPR95 results, especially for RbA, but it is not a consistent gain.
+As result, we found that T=1.0 is competitive for AuPRC most settings. Temperature scaling doesn't meaningfully improve AuPRC, and can shift the FPR95 results, especially for RbA, but it is not a consistent gain.
 Post-hoc temperature calibration is not a reliable method for improving anomaly segmentation on these benchmarks.
+
+\paragraph{Qualitative results.}
+Figure~\ref{fig:step8} shows anomaly score maps for the four scoring methods on representative RoadAnomaly21 images.
+
+\begin{figure*}[!htbp]
+\centering
+\includegraphics[width=\linewidth]{results/figures/step8/step8_anomaly_maps.png}
+\caption{Qualitative comparison of anomaly score maps on RoadAnomaly21. 
+Each row shows an input image alongside score maps produced by MSP, MaxLogit, MaxEntropy, 
+and RbA for EoMT-Cityscapes. Brighter regions indicate higher anomaly score.}
+\label{fig:step8}
+\end{figure*}
