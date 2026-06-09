@@ -74,15 +74,14 @@ This result shows that scoring-method choice depends on the architecture.
 RbA has a different pattern in here. It achieves highest AuPRC on FS L\&F (30.61) and FS Static (56.29) for EoMT-Fine-tuned. 
 However, it also produces high score for FPR95, so it separates the outlier but it is too sensitive so it makes a lot of false alarms.  
 
-\begin{figure*}[!b]
+\begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{results/figures/step8/step8_anomaly_maps.png}
 \caption{Qualitative comparison of anomaly score maps on RoadAnomaly21. 
-Each row shows an input image alongside score maps produced by MSP, MaxLogit, MaxEntropy, 
-and RbA for EoMT-Cityscapes. Brighter regions indicate higher anomaly score.}
+Each row shows an input image alongside score maps produced by MSP, MaxLogit, 
+MaxEntropy, and RbA for EoMT-Cityscapes.}
 \label{fig:step8}
-\end{figure*}
-
+\end{figure}
 \paragraph{Qualitative results.}
 Figure~\ref{fig:step8} shows anomaly score maps for the four scoring methods on representative RoadAnomaly21 images.
 
