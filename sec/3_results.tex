@@ -34,7 +34,7 @@ EoMT-Cityscapes is the best model with 81.68\% mIoU among the compared model. Be
 EoMT-COCO scores 0\% IoU on \texttt{pole, rider}, and near-0\% on \texttt{traffic sign} (Table~\ref{tab:perclass}) because COCO has no equivalent label.
 It is not the problem of the model but a label space mismatch. It is the motivation for fine-tuning.
 Fine-tuning lifts mIoU from 55.17 to 78.85, recovers the most of the gap. This result shows that COCO's DINOv2-backed visual priors work well, the only problem was the classification head, not the features.
-
+The difference is visible in Figure~\ref{fig:step4_comparison} for the class-label mismatch problem.
 \subsection{Anomaly Segmentation}
 
 \paragraph{Pixel-based vs mask-based.}
@@ -62,7 +62,7 @@ This happens because training the model for a short time makes it hyper-focused 
 
 \paragraph{Comparison of scoring functions.}
 Interesting finding here is that MaxLogit beats MSP and MaxEntropy on ERFNet (38.31 vs 29.09 vs 30.96 on RA-21), but on EoMT they are almost same.
-This result shows that scoring-method choice depends on the architecture.
+This result shows that scoring-method choice depends on the architecture. Figure~\ref{fig:step8} shows score maps for the four methods on RA-21 images.
 RbA has a different pattern in here. It achieves highest AuPRC on FS L\&F (30.61) and FS Static (56.29) for EoMT-Fine-tuned. 
 However, it also produces high score for FPR95, so it separates the outlier but it is too sensitive so it makes a lot of false alarms.  
 \begin{figure}[!htbp]
